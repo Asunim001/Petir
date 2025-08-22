@@ -1,252 +1,99 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Kedai Anteiku</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <style>
-    body {
-      background-color: #fff3e0;
-      font-family: 'Segoe UI', sans-serif;
-      padding: 20px;
-    }
-    .container {
-      background: white;
-      border-radius: 16px;
-      padding: 24px;
-      max-width: 600px;
-      margin: auto;
-      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-    }
-    h2 {
-      color: #e53935;
-      text-align: center;
-      margin-bottom: 24px;
-    }
-    table {
-      font-size: 14px;
-    }
-    th {
-      background-color: #e53935;
-      color: white;
-    }
-    .total, .kembalian {
-      font-weight: bold;
-      margin-top: 10px;
-    }
-    #qrisImage {
-      display: none;
-      margin-top: 10px;
-      text-align: center;
-    }
-    #qrisImage img {
-      max-width: 100%;
-      border-radius: 8px;
-    }
-    footer {
-      margin-top: 30px;
-      text-align: center;
-      font-size: 13px;
-      color: #777;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kedai Anteiku</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+  body { padding: 20px; }
+  .menu-item { cursor: pointer; border: 1px solid #ddd; padding: 10px; margin: 5px; border-radius: 10px; }
+  .menu-item:hover { background-color: #f0f0f0; }
+</style>
 </head>
 <body>
-  <div class="container">
-    <h2>Kedai Anteiku</h2>
-    <h3>Petir</h3>
 
-    <select id="barang" class="form-select">
-      <option disabled selected>-- Pilih Barang --</option>
-      <option value="Ramen Shoyu">Ramen Shoyu - 15000</option>
-      <option value="Ramen Curry">Ramen Curry - 15000</option>
-      <option value="Ramen Toripaitan">Ramen Toripaitan - 15000</option>
-      <option value="Ramen Sichuan">Ramen Sichuan - 15000</option>
-      <option value="Dimsum Chili Oil">Dimsum Chili Oil - 15000</option>
-      <option value="Dimsum Mentai">Dimsum Mentai - 18000</option>
-      <option value="Dimsum Mentai Keju">Dimsum Mentai Keju - 20000</option>
-      <option value="Dakbal">Dakbal - 15000</option>
-      <option value="Pangsit Bojot">Pangsit Bojot - 15000</option>
-      <option value="Dimsum Thailand">Dimsum Thailand - 15000</option>
-      <option value="Pangsit Kuah Keju">Pangsit Kuah Keju - 15000</option>
-    </select>
-
-    <select id="topping" class="form-select mt-2">
-      <option value="">-- Pilih Topping (Opsional) --</option>
-      <option value="Beef Teriyaki">Beef Teriyaki - 8000</option>
-      <option value="Chicken Katsu">Chicken Katsu - 5000</option>
-      <option value="Chicken Charsiu">Chicken Charsiu - 5000</option>
-      <option value="Chicken Teriyaki">Chicken Teriyaki - 5000</option>
-    </select>
-
-    <button class="btn btn-danger w-100 mt-2" onclick="tambah()">Tambah</button>
-
-    <table class="table table-bordered mt-3">
-      <thead><tr><th>No</th><th>Item</th><th>Harga</th></tr></thead>
-      <tbody id="tbody"></tbody>
-    </table>
-
-    <div class="total" id="total">Total: Rp 0</div>
-
-    <select id="metode" class="form-select mt-3" onchange="cekMetode()">
-      <option disabled selected>-- Pilih Metode Pembayaran --</option>
+<h2>Kedai Anteiku - Kasir</h2>
+<div class="row">
+  <div class="col-md-6">
+    <h4>Menu</h4>
+    <div class="menu-item" onclick="addToCart('Dimsum Chili Oil', 15000)">Dimsum Chili Oil - Rp 15.000</div>
+    <div class="menu-item" onclick="addToCart('Dimsum Mentai Keju', 20000)">Dimsum Mentai Keju - Rp 20.000</div>
+    <div class="menu-item" onclick="addToCart('Nasi Tempong', 18000)">Nasi Tempong - Rp 18.000</div>
+  </div>
+  <div class="col-md-6">
+    <h4>Keranjang</h4>
+    <ul id="cart" class="list-group"></ul>
+    <h5 class="mt-3">Total: Rp <span id="total">0</span></h5>
+    <input type="number" id="uang" class="form-control mt-2" placeholder="Uang Diterima">
+    <select id="metode" class="form-control mt-2">
       <option value="Cash">Cash</option>
       <option value="QRIS">QRIS</option>
     </select>
-
-    <div id="qrisImage">
-      <p>Silakan scan QR:</p>
-      <img src="qris.jpg" alt="QRIS" />
-    </div>
-
-    <input type="number" id="uang" class="form-control mt-2" placeholder="Uang diterima" oninput="hitungKembalian()" />
-    <div class="kembalian" id="kembalian">Kembalian: Rp 0</div>
-
-    <div class="d-grid gap-2 mt-3">
-      <button class="btn btn-success" onclick="kirim()">Kirim</button>
-      <button class="btn btn-secondary" onclick="resetData()">Reset</button>
-    </div>
+    <button class="btn btn-success mt-3" onclick="checkout()">Selesai</button>
   </div>
+</div>
 
-  <footer>&copy; Kedai Anteiku 2025</footer>
+<script>
+let cart = [];
+let total = 0;
 
-  <script>
-    const barangHarga = {
-      "Ramen Shoyu": 15000,
-      "Ramen Curry": 15000,
-      "Ramen Toripaitan": 15000,
-      "Ramen Sichuan": 15000,
-      "Dimsum Chili Oil": 15000,
-      "Dimsum Mentai": 18000,
-      "Dimsum Mentai Keju": 20000,
-      "Dakbal": 15000,
-      "Pangsit Bojot": 15000,
-      "Dimsum Thailand": 15000,
-      "Pangsit Kuah Keju": 15000
-    };
+function addToCart(name, price) {
+  cart.push({ name, price });
+  total += price;
+  updateCart();
+}
 
-    const toppingHarga = {
-      "Beef Teriyaki": 8000,
-      "Chicken Katsu": 5000,
-      "Chicken Charsiu": 5000,
-      "Chicken Teriyaki": 5000
-    };
+function updateCart() {
+  const cartList = document.getElementById("cart");
+  cartList.innerHTML = "";
+  cart.forEach((item, index) => {
+    const li = document.createElement("li");
+    li.className = "list-group-item d-flex justify-content-between align-items-center";
+    li.innerHTML = `${item.name} - Rp ${item.price.toLocaleString()} <button class="btn btn-sm btn-danger" onclick="removeFromCart(${index})">X</button>`;
+    cartList.appendChild(li);
+  });
+  document.getElementById("total").innerText = total.toLocaleString();
+}
 
-    let items = [];
-    let total = 0;
+function removeFromCart(index) {
+  total -= cart[index].price;
+  cart.splice(index, 1);
+  updateCart();
+}
 
-    function tambah() {
-      const barang = document.getElementById("barang").value.trim();
-      const topping = document.getElementById("topping").value.trim();
+function checkout() {
+  const uang = parseInt(document.getElementById("uang").value) || 0;
+  const metode = document.getElementById("metode").value;
+  const kembalian = uang - total;
+  const now = new Date();
+  const tanggal = now.toLocaleDateString("id-ID");
+  const jam = now.toLocaleTimeString("id-ID");
 
-      if (!barang) return alert("Pilih barang dulu!");
+  const data = {
+    tanggal: tanggal,
+    jam: jam,
+    total: total,
+    uang: uang,
+    kembalian: kembalian,
+    metode: metode,
+    items: cart
+  };
 
-      const hargaBarang = barangHarga[barang];
-      if (!hargaBarang) return alert("Barang tidak ditemukan!");
+  fetch("https://script.google.com/macros/s/AKfycbzSlYToRgYFRhkg_ZO3AwTVf0tj6wmPHdiTLNe-uyM_JRroGzWS1eO7VOwL7hEtKn6Jdw/exec", {
+    method: "POST",
+    mode: "no-cors",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  }).then(() => {
+    alert("Transaksi tersimpan!");
+    cart = [];
+    total = 0;
+    updateCart();
+    document.getElementById("uang").value = "";
+  }).catch(err => alert("Gagal menyimpan: " + err));
+}
+</script>
 
-      items.push({ name: barang, price: hargaBarang });
-      total += hargaBarang;
-
-      if (topping && toppingHarga[topping]) {
-        items.push({ name: "Topping: " + topping, price: toppingHarga[topping] });
-        total += toppingHarga[topping];
-      }
-
-      renderTable();
-      document.getElementById("barang").selectedIndex = 0;
-      document.getElementById("topping").selectedIndex = 0;
-    }
-
-    function renderTable() {
-      const tbody = document.getElementById("tbody");
-      tbody.innerHTML = "";
-      items.forEach((item, i) => {
-        tbody.innerHTML += `<tr><td>${i + 1}</td><td>${item.name}</td><td>Rp ${item.price.toLocaleString()}</td></tr>`;
-      });
-      document.getElementById("total").innerText = `Total: Rp ${total.toLocaleString()}`;
-      hitungKembalian();
-    }
-
-    function hitungKembalian() {
-      const uang = parseInt(document.getElementById("uang").value || 0);
-      const kembalian = uang - total;
-      document.getElementById("kembalian").innerText = `Kembalian: Rp ${kembalian >= 0 ? kembalian.toLocaleString() : 0}`;
-    }
-
-    function cekMetode() {
-      const metode = document.getElementById("metode").value;
-      const qris = document.getElementById("qrisImage");
-      if (metode === "QRIS") {
-        qris.style.display = "block";
-        document.getElementById("uang").value = total;
-      } else {
-        qris.style.display = "none";
-        document.getElementById("uang").value = "";
-      }
-      hitungKembalian();
-    }
-
-    function kirim() {
-      const uang = parseInt(document.getElementById("uang").value || 0);
-      const metode = document.getElementById("metode").value;
-
-      if (items.length === 0) return alert("Belum ada item.");
-      if (!metode || metode.includes("Pilih")) return alert("Pilih metode pembayaran.");
-      if (uang < total) return alert("Uang tidak cukup.");
-
-      const kembalian = uang - total;
-      const now = new Date();
-      const tanggal = now.toISOString().split("T")[0];
-      const jam = now.toTimeString().slice(0,5);
-
-      const data = {
-        tanggal,
-        jam,
-        items,
-        total,
-        uang,
-        kembalian,
-        metode
-      };
-
-      fetch("https://script.google.com/macros/s/AKfycbxYiOLDHCuHkuLR2G_oAT0PET_XGkfTYkZSaAnL9iddMWOb-VvW3QXrXRMDuu31Qu_Ehg/exec", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
-      });
-
-      let pesan = `*Kedai Anteiku*\n\n`;
-      items.forEach((item, i) => {
-        pesan += `${i + 1}. ${item.name} - Rp ${item.price.toLocaleString()}\n`;
-      });
-      pesan += `\n*Total:* Rp ${total.toLocaleString()}`;
-      pesan += `\n*Metode:* ${metode}`;
-      pesan += `\n*Uang Diterima:* Rp ${uang.toLocaleString()}`;
-      pesan += `\n*Kembalian:* Rp ${kembalian.toLocaleString()}`;
-
-      const nomorWA = "6285179856620";
-      const waURL = `https://wa.me/${nomorWA}?text=${encodeURIComponent(pesan)}`;
-      window.location.href = waURL;
-
-      setTimeout(() => {
-        alert("Transaksi berhasil dikirim!");
-        resetData();
-      }, 1000);
-    }
-
-    function resetData() {
-      items = [];
-      total = 0;
-      document.getElementById("barang").selectedIndex = 0;
-      document.getElementById("topping").selectedIndex = 0;
-      document.getElementById("uang").value = "";
-      document.getElementById("metode").selectedIndex = 0;
-      document.getElementById("qrisImage").style.display = "none";
-      document.getElementById("tbody").innerHTML = "";
-      document.getElementById("total").innerText = "Total: Rp 0";
-      document.getElementById("kembalian").innerText = "Kembalian: Rp 0";
-    }
-  </script>
 </body>
 </html>
