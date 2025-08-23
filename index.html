@@ -204,13 +204,13 @@
 
       // Kirim data ke Google Apps Script
       fetch("https://script.google.com/macros/s/AKfycbwf6y4UOGXDkHiiVbg4O-gOqxAQ2G3Vyif2yDo0Nogtw2aNaa2yzHXeRy56_MNXu3d1dw/exec", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
-      })
-      .then(res => res.json())
-      .then(result => console.log("Sukses:", result))
-      .catch(err => console.error("Error:", err));
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify(data)
+})
+.then(res => res.json())
+.then(result => console.log("Sukses:", result))
+.catch(err => console.error("Error:", err));
 
       // Kirim ke WhatsApp
       let pesan = `*Kedai Anteiku*\n\n`;
