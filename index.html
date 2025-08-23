@@ -200,19 +200,38 @@
       const tanggal = now.toISOString().split("T")[0];
       const jam = now.toTimeString().slice(0,5);
 
-      const data = { tanggal, jam, items, total, uang, kembalian, metode };
+      const data = {
+        tanggal,
+        jam,
+        items,
+        total,
+        uang,
+        kembalian,
+        metode
+      };
 
-      // Kirim data ke Google Apps Script
-      fetch("https://script.google.com/macros/s/AKfycbwf6y4UOGXDkHiiVbg4O-gOqxAQ2G3Vyif2yDo0Nogtw2aNaa2yzHXeRy56_MNXu3d1dw/exec", {
+     let form = new FormData();
+let form = new FormData();
+form.append("payload", JSON.stringify(data));
+
+fetch("https://script.google.com/macros/s/AKfycbwf6y4UOGXDkHiiVbg4O-gOqxAQ2G3Vyif2yDo0Nogtw2aNaa2yzHXeRy56_MNXu3d1dw/exec", {
   method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify(data)
+   body: JSON.stringify({
+    tanggal,
+    jam,
+    total,
+    uang,
+    kembalian,
+    metode,
+    items: items   // kirim array lengkap, bukan per item
+  })
+  body: form
 })
 .then(res => res.json())
 .then(result => console.log("Sukses:", result))
 .catch(err => console.error("Error:", err));
 
-      // Kirim ke WhatsApp
+
       let pesan = `*Kedai Anteiku*\n\n`;
       items.forEach((item, i) => {
         pesan += `${i + 1}. ${item.name} - Rp ${item.price.toLocaleString()}\n`;
@@ -224,7 +243,7 @@
 
       const nomorWA = "6285179856620";
       const waURL = `https://wa.me/${nomorWA}?text=${encodeURIComponent(pesan)}`;
-      window.open(waURL, "_blank"); // buka WA di tab baru
+      window.location.href = waURL;
 
       setTimeout(() => {
         alert("Transaksi berhasil dikirim!");
