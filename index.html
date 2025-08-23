@@ -111,106 +111,108 @@
 
   <footer>&copy; Kedai Anteiku 2025</footer>
 
- <script>
-  const barangHarga = {
-    "Ramen Shoyu": 15000,
-    "Ramen Curry": 15000,
-    "Ramen Toripaitan": 15000,
-    "Ramen Sichuan": 15000,
-    "Dimsum Chili Oil": 15000,
-    "Dimsum Mentai": 18000,
-    "Dimsum Mentai Keju": 20000,
-    "Dakbal": 15000,
-    "Pangsit Bojot": 15000,
-    "Dimsum Thailand": 15000,
-    "Pangsit Kuah Keju": 15000
-  };
+  <script>
+    const barangHarga = {
+      "Ramen Shoyu": 15000,
+      "Ramen Curry": 15000,
+      "Ramen Toripaitan": 15000,
+      "Ramen Sichuan": 15000,
+      "Dimsum Chili Oil": 15000,
+      "Dimsum Mentai": 18000,
+      "Dimsum Mentai Keju": 20000,
+      "Dakbal": 15000,
+      "Pangsit Bojot": 15000,
+      "Dimsum Thailand": 15000,
+      "Pangsit Kuah Keju": 15000
+    };
 
-  const toppingHarga = {
-    "Beef Teriyaki": 8000,
-    "Chicken Katsu": 5000,
-    "Chicken Charsiu": 5000,
-    "Chicken Teriyaki": 5000
-  };
+    const toppingHarga = {
+      "Beef Teriyaki": 8000,
+      "Chicken Katsu": 5000,
+      "Chicken Charsiu": 5000,
+      "Chicken Teriyaki": 5000
+    };
 
-  let items = [];
-  let total = 0;
+    let items = [];
+    let total = 0;
 
-  function tambah() {
-    const barang = document.getElementById("barang").value.trim();
-    const topping = document.getElementById("topping").value.trim();
+    function tambah() {
+      const barang = document.getElementById("barang").value.trim();
+      const topping = document.getElementById("topping").value.trim();
 
-    if (!barang) return alert("Pilih barang dulu!");
+      if (!barang) return alert("Pilih barang dulu!");
 
-    const hargaBarang = barangHarga[barang];
-    items.push({ name: barang, price: hargaBarang });
-    total += hargaBarang;
+      const hargaBarang = barangHarga[barang];
+      if (!hargaBarang) return alert("Barang tidak ditemukan!");
 
-    if (topping && toppingHarga[topping]) {
-      items.push({ name: "Topping: " + topping, price: toppingHarga[topping] });
-      total += toppingHarga[topping];
+      items.push({ name: barang, price: hargaBarang });
+      total += hargaBarang;
+
+      if (topping && toppingHarga[topping]) {
+        items.push({ name: "Topping: " + topping, price: toppingHarga[topping] });
+        total += toppingHarga[topping];
+      }
+
+      renderTable();
+      document.getElementById("barang").selectedIndex = 0;
+      document.getElementById("topping").selectedIndex = 0;
     }
 
-    renderTable();
-    document.getElementById("barang").selectedIndex = 0;
-    document.getElementById("topping").selectedIndex = 0;
-  }
-
-  function renderTable() {
-    const tbody = document.getElementById("tbody");
-    tbody.innerHTML = "";
-    items.forEach((item, i) => {
-      tbody.innerHTML += `<tr><td>${i + 1}</td><td>${item.name}</td><td>Rp ${item.price.toLocaleString()}</td></tr>`;
-    });
-    document.getElementById("total").innerText = `Total: Rp ${total.toLocaleString()}`;
-    hitungKembalian();
-  }
-
-  function hitungKembalian() {
-    const uang = parseInt(document.getElementById("uang").value || 0);
-    const kembalian = uang - total;
-    document.getElementById("kembalian").innerText = `Kembalian: Rp ${kembalian >= 0 ? kembalian.toLocaleString() : 0}`;
-  }
-
-  function cekMetode() {
-    const metode = document.getElementById("metode").value;
-    const qris = document.getElementById("qrisImage");
-    if (metode === "QRIS") {
-      qris.style.display = "block";
-      document.getElementById("uang").value = total;
-    } else {
-      qris.style.display = "none";
-      document.getElementById("uang").value = "";
+    function renderTable() {
+      const tbody = document.getElementById("tbody");
+      tbody.innerHTML = "";
+      items.forEach((item, i) => {
+        tbody.innerHTML += `<tr><td>${i + 1}</td><td>${item.name}</td><td>Rp ${item.price.toLocaleString()}</td></tr>`;
+      });
+      document.getElementById("total").innerText = `Total: Rp ${total.toLocaleString()}`;
+      hitungKembalian();
     }
-    hitungKembalian();
-  }
 
-  function kirim() {
-    const uang = parseInt(document.getElementById("uang").value || 0);
-    const metode = document.getElementById("metode").value;
+    function hitungKembalian() {
+      const uang = parseInt(document.getElementById("uang").value || 0);
+      const kembalian = uang - total;
+      document.getElementById("kembalian").innerText = `Kembalian: Rp ${kembalian >= 0 ? kembalian.toLocaleString() : 0}`;
+    }
 
-    if (items.length === 0) return alert("Belum ada item.");
-    if (!metode || metode.includes("Pilih")) return alert("Pilih metode pembayaran.");
-    if (uang < total) return alert("Uang tidak cukup.");
+    function cekMetode() {
+      const metode = document.getElementById("metode").value;
+      const qris = document.getElementById("qrisImage");
+      if (metode === "QRIS") {
+        qris.style.display = "block";
+        document.getElementById("uang").value = total;
+      } else {
+        qris.style.display = "none";
+        document.getElementById("uang").value = "";
+      }
+      hitungKembalian();
+    }
 
-    const kembalian = uang - total;
-    const now = new Date();
-    const tanggal = now.toISOString().split("T")[0];
-    const jam = now.toTimeString().slice(0,5);
+    function kirim() {
+      const uang = parseInt(document.getElementById("uang").value || 0);
+      const metode = document.getElementById("metode").value;
 
-    const data = { tanggal, jam, items, total, uang, kembalian, metode };
+      if (items.length === 0) return alert("Belum ada item.");
+      if (!metode || metode.includes("Pilih")) return alert("Pilih metode pembayaran.");
+      if (uang < total) return alert("Uang tidak cukup.");
 
-    // Kirim ke Google Apps Script
-    fetch("https://script.google.com/macros/s/AKfycbwf6y4UOGXDkHiiVbg4O-gOqxAQ2G3Vyif2yDo0Nogtw2aNaa2yzHXeRy56_MNXu3d1dw/exec", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data)
-    })
-    .then(res => res.json())
-    .then(result => {
-      console.log("Sukses:", result);
+      const kembalian = uang - total;
+      const now = new Date();
+      const tanggal = now.toISOString().split("T")[0];
+      const jam = now.toTimeString().slice(0,5);
 
-      // Kirim ke WhatsApp setelah berhasil ke GAS
+      const data = { tanggal, jam, items, total, uang, kembalian, metode };
+
+      // Kirim data ke Google Apps Script
+      fetch("https://script.google.com/macros/s/AKfycbwf6y4UOGXDkHiiVbg4O-gOqxAQ2G3Vyif2yDo0Nogtw2aNaa2yzHXeRy56_MNXu3d1dw/exec", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      })
+      .then(res => res.json())
+      .then(result => console.log("Sukses:", result))
+      .catch(err => console.error("Error:", err));
+
+      // Kirim ke WhatsApp
       let pesan = `*Kedai Anteiku*\n\n`;
       items.forEach((item, i) => {
         pesan += `${i + 1}. ${item.name} - Rp ${item.price.toLocaleString()}\n`;
@@ -222,27 +224,26 @@
 
       const nomorWA = "6285179856620";
       const waURL = `https://wa.me/${nomorWA}?text=${encodeURIComponent(pesan)}`;
-      window.open(waURL, "_blank");
+      window.open(waURL, "_blank"); // buka WA di tab baru
 
-      alert("Transaksi berhasil dikirim!");
-      resetData();
-    })
-    .catch(err => console.error("Error:", err));
-  }
+      setTimeout(() => {
+        alert("Transaksi berhasil dikirim!");
+        resetData();
+      }, 1000);
+    }
 
-  function resetData() {
-    items = [];
-    total = 0;
-    document.getElementById("barang").selectedIndex = 0;
-    document.getElementById("topping").selectedIndex = 0;
-    document.getElementById("uang").value = "";
-    document.getElementById("metode").selectedIndex = 0;
-    document.getElementById("qrisImage").style.display = "none";
-    document.getElementById("tbody").innerHTML = "";
-    document.getElementById("total").innerText = "Total: Rp 0";
-    document.getElementById("kembalian").innerText = "Kembalian: Rp 0";
-  }
-</script>
-
+    function resetData() {
+      items = [];
+      total = 0;
+      document.getElementById("barang").selectedIndex = 0;
+      document.getElementById("topping").selectedIndex = 0;
+      document.getElementById("uang").value = "";
+      document.getElementById("metode").selectedIndex = 0;
+      document.getElementById("qrisImage").style.display = "none";
+      document.getElementById("tbody").innerHTML = "";
+      document.getElementById("total").innerText = "Total: Rp 0";
+      document.getElementById("kembalian").innerText = "Kembalian: Rp 0";
+    }
+  </script>
 </body>
 </html>
