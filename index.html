@@ -112,34 +112,142 @@
   <footer>&copy; Kedai Anteiku 2025</footer>
 
   <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbwNiF7wUHPaGwGvVuqUwH94SduyXRNVY7370SwPPEDAQqhxq1oyf8QXMX7KCQelrwzwpw/exec";
+    const barangHarga = {
+      "Ramen Shoyu": 15000,
+      "Ramen Curry": 15000,
+      "Ramen Toripaitan": 15000,
+      "Ramen Sichuan": 15000,
+      "Dimsum Chili Oil": 15000,
+      "Dimsum Mentai": 18000,
+      "Dimsum Mentai Keju": 20000,
+      "Dakbal": 15000,
+      "Pangsit Bojot": 15000,
+      "Dimsum Thailand": 15000,
+      "Pangsit Kuah Keju": 15000
+    };
 
-function kirim() {
-  const data = {
-    tanggal: document.getElementById("tanggal").value,
-    jam: document.getElementById("jam").value,
-    items: JSON.parse(document.getElementById("items").value),
-    total: document.getElementById("total").value,
-    uang: document.getElementById("uang").value,
-    kembalian: document.getElementById("kembalian").value,
-    metode: document.getElementById("metode").value
-  };
+    const toppingHarga = {
+      "Beef Teriyaki": 8000,
+      "Chicken Katsu": 5000,
+      "Chicken Charsiu": 5000,
+      "Chicken Teriyaki": 5000
+    };
 
-  fetch(API_URL, {
-    method: "POST",
-    mode: "cors",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data)
-  })
-  .then(res => res.json())
-  .then(res => {
-    alert("✅ Data berhasil dikirim ke Google Sheets!");
-  })
-  .catch(err => {
-    alert("❌ Gagal mengirim data: " + err);
-  });
-}
-</script>
+    let items = [];
+    let total = 0;
 
+    function tambah() {
+      const barang = document.getElementById("barang").value.trim();
+      const topping = document.getElementById("topping").value.trim();
+
+      if (!barang) return alert("Pilih barang dulu!");
+
+      const hargaBarang = barangHarga[barang];
+      if (!hargaBarang) return alert("Barang tidak ditemukan!");
+
+      items.push({ name: barang, price: hargaBarang });
+      total += hargaBarang;
+
+      if (topping && toppingHarga[topping]) {
+        items.push({ name: "Topping: " + topping, price: toppingHarga[topping] });
+        total += toppingHarga[topping];
+      }
+
+      renderTable();
+      document.getElementById("barang").selectedIndex = 0;
+      document.getElementById("topping").selectedIndex = 0;
+    }
+
+    function renderTable() {
+      const tbody = document.getElementById("tbody");
+      tbody.innerHTML = "";
+      items.forEach((item, i) => {
+        tbody.innerHTML += `<tr><td>${i + 1}</td><td>${item.name}</td><td>Rp ${item.price.toLocaleString()}</td></tr>`;
+      });
+      document.getElementById("total").innerText = `Total: Rp ${total.toLocaleString()}`;
+      hitungKembalian();
+    }
+
+    function hitungKembalian() {
+      const uang = parseInt(document.getElementById("uang").value || 0);
+      const kembalian = uang - total;
+      document.getElementById("kembalian").innerText = `Kembalian: Rp ${kembalian >= 0 ? kembalian.toLocaleString() : 0}`;
+    }
+
+    function cekMetode() {
+      const metode = document.getElementById("metode").value;
+      const qris = document.getElementById("qrisImage");
+      if (metode === "QRIS") {
+        qris.style.display = "block";
+        document.getElementById("uang").value = total;
+      } else {
+        qris.style.display = "none";
+        document.getElementById("uang").value = "";
+      }
+      hitungKembalian();
+    }
+
+    function kirim() {
+      const uang = parseInt(document.getElementById("uang").value || 0);
+      const metode = document.getElementById("metode").value;
+
+      if (items.length === 0) return alert("Belum ada item.");
+      if (!metode || metode.includes("Pilih")) return alert("Pilih metode pembayaran.");
+      if (uang < total) return alert("Uang tidak cukup.");
+
+      const kembalian = uang - total;
+      const now = new Date();
+      const tanggal = now.toISOString().split("T")[0];
+      const jam = now.toTimeString().slice(0,5);
+
+      const data = {
+        tanggal,
+        jam,
+        items,
+        total,
+        uang,
+        kembalian,
+        metode
+      };
+
+      fetch("https://script.google.com/macros/s/AKfycbwpHqdSwpE9fjrateZjlOBRMf9MRCL4LFeYnUIjW3JQeCWn8GSjZYAAbadVYW2idsgYHQ/exec", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify(data)
+});
+
+
+      let pesan = `*Kedai Anteiku*\n\n`;
+      items.forEach((item, i) => {
+        pesan += `${i + 1}. ${item.name} - Rp ${item.price.toLocaleString()}\n`;
+      });
+      pesan += `\n*Total:* Rp ${total.toLocaleString()}`;
+      pesan += `\n*Metode:* ${metode}`;
+      pesan += `\n*Uang Diterima:* Rp ${uang.toLocaleString()}`;
+      pesan += `\n*Kembalian:* Rp ${kembalian.toLocaleString()}`;
+
+      const nomorWA = "6285179856620";
+      const waURL = `https://wa.me/${nomorWA}?text=${encodeURIComponent(pesan)}`;
+      window.location.href = waURL;
+
+      setTimeout(() => {
+        alert("Transaksi berhasil dikirim!");
+        resetData();
+      }, 1000);
+    }
+
+    function resetData() {
+      items = [];
+      total = 0;
+      document.getElementById("barang").selectedIndex = 0;
+      document.getElementById("topping").selectedIndex = 0;
+      document.getElementById("uang").value = "";
+      document.getElementById("metode").selectedIndex = 0;
+      document.getElementById("qrisImage").style.display = "none";
+      document.getElementById("tbody").innerHTML = "";
+      document.getElementById("total").innerText = "Total: Rp 0";
+      document.getElementById("kembalian").innerText = "Kembalian: Rp 0";
+    }
+  </script>
 </body>
 </html>
