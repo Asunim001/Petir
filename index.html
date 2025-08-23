@@ -210,11 +210,16 @@
         metode
       };
 
-      fetch("https://script.google.com/macros/s/AKfycbwpHqdSwpE9fjrateZjlOBRMf9MRCL4LFeYnUIjW3JQeCWn8GSjZYAAbadVYW2idsgYHQ/exec", {
+     let form = new FormData();
+form.append("payload", JSON.stringify(data));
+
+fetch("https://script.google.com/macros/s/AKfycbwpHqdSwpE9fjrateZjlOBRMf9MRCL4LFeYnUIjW3JQeCWn8GSjZYAAbadVYW2idsgYHQ/exec", {
   method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify(data)
-});
+  body: form
+})
+.then(res => res.json())
+.then(res => console.log("Berhasil:", res))
+.catch(err => console.error("Error:", err));
 
 
       let pesan = `*Kedai Anteiku*\n\n`;
