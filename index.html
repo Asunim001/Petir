@@ -210,21 +210,16 @@
         metode
       };
 
-     let form = new FormData();
+let form = new FormData();
 form.append("payload", JSON.stringify(data));
 
 fetch("https://script.google.com/macros/s/AKfycbwf6y4UOGXDkHiiVbg4O-gOqxAQ2G3Vyif2yDo0Nogtw2aNaa2yzHXeRy56_MNXu3d1dw/exec", {
   method: "POST",
-   body: JSON.stringify({
-    tanggal,
-    jam,
-    total,
-    uang,
-    kembalian,
-    metode,
-    items: items   // kirim array lengkap, bukan per item
-  })
+  body: form
 })
+.then(res => res.json())
+.then(result => console.log("Sukses:", result))
+.catch(err => console.error("Error:", err));
 
 
       let pesan = `*Kedai Anteiku*\n\n`;
